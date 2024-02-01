@@ -4,15 +4,23 @@ class Program
 {
     static void Main(string[] args)
     {
-        bool continueCalculating = true;
-        while (continueCalculating)
+        Console.WriteLine("Welcome to the Simple Calculator!");
+        Console.WriteLine("Supported operations: +, -, *, /, ^ (exponent), % (modulo)");
+        Console.WriteLine("Type 'exit' to close the calculator.");
+
+        while (true)
         {
             try
             {
-                double num1 = GetValidNumber("Enter the first number:");
+                Console.WriteLine("\nEnter the first number or 'exit' to close:");
+                string input = Console.ReadLine().ToLower();
+                if (input == "exit") break;
+
+                double num1 = GetValidNumber(input);
                 double num2 = GetValidNumber("Enter the second number:");
-                Console.WriteLine("Enter operation (+, -, *, /):");
-                char operation = Console.ReadLine()[0];
+
+                Console.WriteLine("Enter operation:");
+                char operation = GetValidOperation(Console.ReadLine());
 
                 double result = PerformCalculation(num1, num2, operation);
                 Console.WriteLine("Result: " + result);
@@ -21,41 +29,44 @@ class Program
             {
                 Console.WriteLine(ex.Message);
             }
-
-            Console.WriteLine("Do you want to perform another calculation? (yes/no)");
-            continueCalculating = Console.ReadLine().ToLower() == "yes";
         }
     }
 
-    static double GetValidNumber(string prompt)
+    static double GetValidNumber(string input)
     {
-        double number;
-        Console.WriteLine(prompt);
-        while (!double.TryParse(Console.ReadLine(), out number))
+        if (double.TryParse(input, out double number))
         {
-            Console.WriteLine("Invalid input. Please enter a valid number:");
+            return number;
         }
-        return number;
+        else
+        {
+            throw new FormatException("Invalid number. Please enter a valid number.");
+        }
+    }
+
+    static char GetValidOperation(string input)
+    {
+        if (input.Length == 1 && "+-*/^%".Contains(input))
+        {
+            return input[0];
+        }
+        else
+        {
+            throw new FormatException("Invalid operation. Please enter a valid operation.");
+        }
     }
 
     static double PerformCalculation(double num1, double num2, char operation)
     {
-        switch (operation)
+        return operation switch
         {
-            case '+':
-                return num1 + num2;
-            case '-':
-                return num1 - num2;
-            case '*':
-                return num1 * num2;
-            case '/':
-                if (num2 == 0)
-                {
-                    throw new DivideByZeroException("Division by zero is not allowed.");
-                }
-                return num1 / num2;
-            default:
-                throw new InvalidOperationException("Invalid operation.");
-        }
+            '+' => num1 + num2,
+            '-' => num1 - num2,
+            '*' => num1 * num2,
+            '/' => num2 == 0 ? throw new DivideByZeroException("Division by zero is not allowed.") : num1 / num2,
+            '^' => Math.Pow(num1, num2),
+            '%' => num1 % num2,
+            _ => throw new InvalidOperationException("Invalid operation."),
+        };
     }
 }
