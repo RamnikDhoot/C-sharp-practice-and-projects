@@ -2,28 +2,33 @@ using System;
 
 class Program
 {
+    static double? memoryValue = null;
+
     static void Main(string[] args)
     {
-        Console.WriteLine("Welcome to the Simple Calculator!");
+        Console.WriteLine("Welcome to the Enhanced Calculator!");
         Console.WriteLine("Supported operations: +, -, *, /, ^ (exponent), % (modulo)");
-        Console.WriteLine("Type 'exit' to close the calculator.");
+        Console.WriteLine("Special commands: 'exit' to close, 'mem' to use stored memory, 'clear' to clear memory.");
 
         while (true)
         {
             try
             {
-                Console.WriteLine("\nEnter the first number or 'exit' to close:");
-                string input = Console.ReadLine().ToLower();
-                if (input == "exit") break;
+                Console.WriteLine("\nEnter the first number, 'mem' to use memory, or 'exit' to close:");
+                string firstInput = Console.ReadLine().ToLower();
+                if (firstInput == "exit") break;
+                if (firstInput == "clear") { memoryValue = null; continue; }
 
-                double num1 = GetValidNumber(input);
-                double num2 = GetValidNumber("Enter the second number:");
+                double num1 = firstInput == "mem" && memoryValue.HasValue ? memoryValue.Value : GetValidNumber(firstInput);
 
-                Console.WriteLine("Enter operation:");
-                char operation = GetValidOperation(Console.ReadLine());
+                double num2 = GetValidNumber("Enter the second number (or 'mem' to use memory):", true);
+
+                char operation = GetValidOperation();
 
                 double result = PerformCalculation(num1, num2, operation);
                 Console.WriteLine("Result: " + result);
+
+                memoryValue = result; // Store the result in memory after every successful calculation
             }
             catch (Exception ex)
             {
@@ -32,9 +37,13 @@ class Program
         }
     }
 
-    static double GetValidNumber(string input)
+    static double GetValidNumber(string input, bool allowMemory = false)
     {
-        if (double.TryParse(input, out double number))
+        if (allowMemory && input.ToLower() == "mem" && memoryValue.HasValue)
+        {
+            return memoryValue.Value;
+        }
+        else if (double.TryParse(input, out double number))
         {
             return number;
         }
@@ -44,15 +53,20 @@ class Program
         }
     }
 
-    static char GetValidOperation(string input)
+    static char GetValidOperation()
     {
-        if (input.Length == 1 && "+-*/^%".Contains(input))
+        while (true)
         {
-            return input[0];
-        }
-        else
-        {
-            throw new FormatException("Invalid operation. Please enter a valid operation.");
+            Console.WriteLine("Enter operation (+, -, *, /, ^, %):");
+            string input = Console.ReadLine();
+            if (input.Length == 1 && "+-*/^%".Contains(input))
+            {
+                return input[0];
+            }
+            else
+            {
+                Console.WriteLine("Invalid operation. Please enter a valid operation.");
+            }
         }
     }
 
