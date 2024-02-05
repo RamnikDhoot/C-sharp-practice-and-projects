@@ -53,19 +53,77 @@ class Program
         }
     }
 
-    static double GetValidNumber(string input, bool allowMemory = false)
-    {
-        if (allowMemory && input.ToLower() == "mem" && memoryValue.HasValue)
-        {
-            return memoryValue.Value;
-        }
-        else if (double.TryParse(input, out double number))
-        {
-            return number;
+    .WriteLine("No history yet.");
         }
         else
         {
-            throw new FormatException("Invalid number. Please enter a valid number.");
+            Console.WriteLine("Calculation History:");
+            foreach (var entry in history)
+            {
+                Console.WriteLine(entry);
+            }
+        }
+    }
+
+    static bool IsValidOperation(string operation)
+    {
+        return new List<string> { "+", "-", "*", "/", "^", "%", "sin", "cos", "tan", "sqrt", "log" }.Contains(operation);
+    }
+
+    static bool IsUnaryOperation(string operation)
+    {
+        return new List<string> { "sin", "cos", "tan", "sqrt", "log" }.Contains(operation);
+    }
+
+    static double PerformBinaryCalculation(double num1, double num2, string operation)
+    {
+        switch (operation)
+        {
+            case "+":
+                return num1 + num2;
+            case "-":
+                return num1 - num2;
+            case "*":
+                return num1 * num2;
+            case "/":
+                if (num2 == 0)
+                {
+                    throw new DivideByZeroException("Division by zero is not allowed.");
+                }
+                return num1 / num2;
+            case "^":
+                return Math.Pow(num1, num2);
+            case "%":
+                return num1 % num2;
+            default:
+                throw new InvalidOperationException("Invalid operation.");
+        }
+    }
+
+    static double PerformUnaryCalculation(double num, string operation)
+    {
+        switch (operation)
+        {
+            case "sin":
+                return Math.Sin(num);
+            case "cos":
+                return Math.Cos(num);
+            case "tan":
+                return Math.Tan(num);
+            case "sqrt":
+                if (num < 0)
+                {
+                    throw new ArgumentException("Cannot calculate the square root of a negative number.");
+                }
+                return Math.Sqrt(num);
+            case "log":
+                if (num <= 0)
+                {
+                    throw new ArgumentException("Logarithm of non-positive numbers is undefined.");
+                }
+                return Math.Log(num);
+            default:
+                throw new InvalidOperationException("Invalid operation.");
         }
     }
 
@@ -86,42 +144,23 @@ class Program
         }
     }
 
-    static bool IsValidOperation(string operation)
+    static double GetValidNumber(string input, bool allowMemory = false)
     {
-        return new List<string> { "+", "-", "*", "/", "^", "%", "sin", "cos", "tan", "sqrt", "log" }.Contains(operation);
-    }
-
-    static bool IsUnaryOperation(string operation)
-    {
-        return new List<string> { "sin", "cos", "tan", "sqrt", "log" }.Contains(operation);
-    }
-
-    static double PerformBinaryCalculation(double num1, double num2, string operation)
-    {
-        return operation switch
+        if (allowMemory && input.ToLower() == "mem" && memoryValue.HasValue)
         {
-            "+" => num1 + num2,
-            "-" => num1 - num2,
-            "*" => num1 * num2,
-            "/" => num2 == 0 ? throw new DivideByZeroException("Division by zero is not allowed.") : num1 / num2,
-            "^" => Math.Pow(num1, num2),
-            "%" => num1 % num2,
-            _ => throw new InvalidOperationException("Invalid operation."),
-        };
-    }
-
-    static double PerformUnaryCalculation(double num, string operation)
-    {
-        return operation switch
+            return memoryValue.Value;
+        }
+        else if (double.TryParse(input, out double number))
         {
-            "sin" => Math.Sin(num),
-            "cos" => Math.Cos(num),
-            "tan" => Math.Tan(num),
-            "sqrt" => Math.Sqrt(num),
-            "log" => Math.Log(num),
-            _ => throw new InvalidOperationException("Invalid operation."),
-        };
+            return number;
+        }
+        else
+        {
+            throw new FormatException("Invalid number. Please enter a valid number.");
+        }
     }
+}
+
 
     static void DisplayHistory()
     {
