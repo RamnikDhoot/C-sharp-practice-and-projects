@@ -243,4 +243,39 @@ static void ProcessCommand(string command)
         Console.WriteLine("You can define custom macros using the 'define' command followed by the macro name and its operation.");
     }
 
+    static void DefineMacro(string input)
+{
+    // Example input: "define add3 x + 3"
+    var parts = input.Split(new[] { ' ' }, 4);
+    if (parts.Length < 4 || parts[0] != "define")
+    {
+        Console.WriteLine("Invalid macro definition. Use: define [name] [expression]");
+        return;
+    }
+
+    var macroName = parts[1];
+    var operation = parts[3]; // Simplified: Directly use the operation string in this example
+
+    // Storing the operation as a macro (simplified version for demonstration)
+    if (!userDefinedMacros.ContainsKey(macroName))
+    {
+        userDefinedMacros[macroName] = (num1, _) => num1; // Placeholder for actual operation
+        Console.WriteLine($"Macro '{macroName}' defined.");
+    }
+    else
+    {
+        Console.WriteLine($"Macro '{macroName}' is already defined.");
+    }
+}
+
+static void ProcessCommand(string command)
+{
+    if (command.StartsWith("define"))
+    {
+        DefineMacro(command);
+    }
+    else
+}
+
+
 }
