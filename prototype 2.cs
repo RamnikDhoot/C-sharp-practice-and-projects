@@ -38,16 +38,11 @@ class Program
                         break;
                 }
 
-                if (firstInput == "mem" && !memoryValue.HasValue)
-                {
-                    Console.WriteLine("Memory is empty.");
-                    continue;
-                }
-
                 double num1 = firstInput == "mem" && memoryValue.HasValue ? memoryValue.Value : GetValidNumber(firstInput);
                 string operation = GetValidOperation();
 
-                double result;
+                double result = 0;
+
                 if (IsUnaryOperation(operation))
                 {
                     result = PerformUnaryCalculation(num1, operation);
@@ -62,6 +57,16 @@ class Program
                     double num2 = GetValidNumber("Enter the second number (or 'mem' to use memory):", true);
                     result = PerformBinaryCalculation(num1, num2, operation);
                 }
+
+                Console.WriteLine($"Result: {result}");
+                memoryValue = result; // Store the result in memory
+                history.Add($"{num1} {operation} {result}"); // Add to history
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
 
                 Console.WriteLine("Result: " + result);
                 memoryValue = result;
