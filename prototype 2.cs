@@ -100,6 +100,16 @@ class Program
         "!" => Factorial(num),
         _ => throw new InvalidOperationException("Invalid operation."),
     };
+    while (true)
+{
+    Console.Write("\nEnter command or calculation: ");
+    string input = Console.ReadLine().ToLower();
+
+    if (input == "exit") break;
+    else if (input.StartsWith("define")) DefineMacro(input);
+    else if (input == "help") DisplayHelp();
+    
+}
 }
 
 static double PerformBinaryCalculation(double num1, double num2, string operation)
