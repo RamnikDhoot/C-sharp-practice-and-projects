@@ -38,45 +38,52 @@ class Program
                         break;
                 }
 
-                double num1 = firstInput == "mem" && memoryValue.HasValue ? memoryValue.Value : GetValidNumber(firstInput);
-                string operation = GetValidOperation();
+try
+{
+    if (userDefinedMacros.ContainsKey(input))
+    {
+        Console.WriteLine("Enter the number for the macro:");
+        double num = Convert.ToDouble(Console.ReadLine());
+        double result = userDefinedMacros[input].Invoke(num, 0); // Simplified: Macros in this example use one argument
+        Console.WriteLine($"Macro result: {result}");
+        memoryValue = result;
+        history.Add($"{input}({num}) = {result}");
+    }
+    else
+    {
+       
+        var parts = input.Split(' ');
+        if (parts.Length == 3)
+        {
+            double num1 = GetValidNumber(parts[0]);
+            string operation = parts[1];
+            double num2 = GetValidNumber(parts[2], true);
 
-                double result = 0;
-
-                if (IsUnaryOperation(operation))
-                {
-                    result = PerformUnaryCalculation(num1, operation);
-                }
-                else if (userDefinedMacros.ContainsKey(operation))
-                {
-                    double num2 = GetValidNumber("Enter the second number (or 'mem' to use memory):", true);
-                    result = userDefinedMacros[operation].Invoke(num1, num2);
-                }
-                else
-                {
-                    double num2 = GetValidNumber("Enter the second number (or 'mem' to use memory):", true);
-                    result = PerformBinaryCalculation(num1, num2, operation);
-                }
-
-                Console.WriteLine($"Result: {result}");
-                memoryValue = result; // Store the result in memory
-                history.Add($"{num1} {operation} {result}"); // Add to history
-            }
-            catch (Exception ex)
+            double result;
+            if (IsUnaryOperation(operation))
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                result = PerformUnaryCalculation(num1, operation);
             }
-        }
-
-                Console.WriteLine("Result: " + result);
-                memoryValue = result;
-                history.Add($"{num1} {operation} = {result}");
-            }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine(ex.Message);
+                result = PerformBinaryCalculation(num1, num2, operation);
             }
+
+            Console.WriteLine($"Result: {result}");
+            memoryValue = result;
+            history.Add($"{num1} {operation} {num2} = {result}");
         }
+        else
+        {
+            Console.WriteLine("Invalid input. Please enter a valid calculation or use a defined macro.");
+        }
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error processing input: {ex.Message}");
+}
+
     }
      static bool IsValidOperation(string operation)
     {
